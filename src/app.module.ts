@@ -10,6 +10,7 @@ import { FilmsModule } from "./films/films.module";
 import * as Joi from "joi";
 import { FilmEntity } from "./films/entities/film.entity";
 import { AuthModule } from "./auth/auth.module";
+import { SessionsModule } from "./sessions/sessions.module";
 
 @Module({
     imports: [
@@ -31,7 +32,7 @@ import { AuthModule } from "./auth/auth.module";
         TypeOrmModule.forRootAsync({
             useFactory: (configService: ConfigService) => ({
                 type: "postgres",
-                host: "localhost",
+                host: configService.getOrThrow<string>("DB_HOST"),
                 port: 5432,
                 username: "postgres",
                 password: configService.getOrThrow<string>("DB_PASSWORD"),
@@ -40,7 +41,8 @@ import { AuthModule } from "./auth/auth.module";
                 synchronize: true
             }),
             inject: [ConfigService]
-        })
+        }),
+        SessionsModule
     ],
     controllers: [AppController],
     providers: [AppService]
