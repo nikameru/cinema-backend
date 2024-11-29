@@ -17,8 +17,10 @@ export class FilmDto extends FilmEntity {
     @IsString()
     rating: number;
 
-    @IsString()
-    cast: string;
+    @IsString({
+        each: true
+    })
+    cast: string[];
 
     @IsString()
     duration: string;

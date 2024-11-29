@@ -6,6 +6,6 @@ export class SeatEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @ManyToOne(() => RoomEntity, (room) => room.seats, { onDelete: 'CASCADE' })
-    room: RoomEntity;  
+    @ManyToOne(() => RoomEntity, (room) => room.seats, { onDelete: "CASCADE" })
+    room: RoomEntity;
 }

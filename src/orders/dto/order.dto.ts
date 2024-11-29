@@ -1,6 +1,7 @@
 import { IsNumber } from "class-validator";
+import { OrderEntity } from "../entities/order.entity";
 
-export class OrderDto {
+export class OrderDto extends OrderEntity {
     @IsNumber()
     id: number;
 

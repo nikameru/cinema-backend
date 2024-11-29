@@ -5,7 +5,9 @@ export class FilmEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({
+        unique: true
+    })
     title: string;
 
     @Column()
@@ -14,11 +16,13 @@ export class FilmEntity {
     @Column()
     genre: string;
 
-    @Column()
+    @Column({
+        nullable: true
+    })
     rating: number;
 
     @Column()
-    cast: string;
+    cast: string[];
 
     @Column()
     duration: string;
