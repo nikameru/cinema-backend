@@ -9,7 +9,7 @@ import { OrdersModule } from "./orders/orders.module";
 import { FilmsModule } from "./films/films.module";
 import * as Joi from "joi";
 import { FilmEntity } from "./films/entities/film.entity";
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from "./auth/auth.module";
 
 @Module({
     imports: [

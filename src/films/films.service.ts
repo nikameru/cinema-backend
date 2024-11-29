@@ -9,7 +9,8 @@ import { Repository } from "typeorm";
 export class FilmsService {
     constructor(
         @InjectRepository(FilmEntity)
-        private readonly filmRepository: Repository<FilmEntity>) {}
+        private readonly filmRepository: Repository<FilmEntity>
+    ) {}
     create(createFilmDto: CreateFilmDto) {
         const film = this.filmRepository.create(createFilmDto);
         return this.filmRepository.save(film);
