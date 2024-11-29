@@ -26,4 +26,7 @@ export class FilmEntity {
 
     @Column()
     duration: string;
+
+    @Column()
+    trailerYoutubeLink: string;
 }

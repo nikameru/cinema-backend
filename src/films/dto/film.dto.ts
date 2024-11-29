@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, IsString, IsUrl } from "class-validator";
 import { FilmEntity } from "../entities/film.entity";
 
 export class FilmDto extends FilmEntity {
@@ -22,4 +22,7 @@ export class FilmDto extends FilmEntity {
 
     @IsString()
     duration: string;
+
+    @IsUrl()
+    trailerYoutubeLink: string;
 }
