@@ -9,15 +9,14 @@ import { OrdersModule } from "./orders/orders.module";
 import { FilmsModule } from "./films/films.module";
 import * as Joi from "joi";
 import { FilmEntity } from "./films/entities/film.entity";
-import { AuthModule } from './auth/auth.module';
-import { SeatsModule } from './seats/seats.module';
-import { RoomsModule } from './rooms/rooms.module';
+import { AuthModule } from "./auth/auth.module";
+import { SeatsModule } from "./seats/seats.module";
+import { RoomsModule } from "./rooms/rooms.module";
 import { RoomEntity } from "./rooms/entities/room.entity";
 import { SeatEntity } from "./seats/entities/seat.entity";
-import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-yet';
+import { CacheModule } from "@nestjs/cache-manager";
+import { redisStore } from "cache-manager-redis-yet";
 import { OrderEntity } from "./orders/entities/order.entity";
-
 
 @Module({
     imports: [
@@ -50,23 +49,29 @@ import { OrderEntity } from "./orders/entities/order.entity";
                 username: configService.getOrThrow<string>("POSTGRES_USER"),
                 password: configService.getOrThrow<string>("POSTGRES_PASSWORD"),
                 database: configService.getOrThrow<string>("POSTGRES_DB"),
-                entities: [UserEntity, FilmEntity, RoomEntity, SeatEntity, OrderEntity],
+                entities: [
+                    UserEntity,
+                    FilmEntity,
+                    RoomEntity,
+                    SeatEntity,
+                    OrderEntity
+                ],
                 synchronize: true
             }),
             inject: [ConfigService]
         }),
-        CacheModule.registerAsync({  
-            isGlobal: true,  
-            useFactory: async (configService: ConfigService) => ({  
-              store: await redisStore({  
-                socket: {  
-                  host: configService.getOrThrow<string>("REDIS_HOST"),  
-                  port: +configService.getOrThrow<string>("REDIS_PORT")
-                },        
-              }),      
-            }),   
-            inject: [ConfigService] 
-          }),    
+        CacheModule.registerAsync({
+            isGlobal: true,
+            useFactory: async (configService: ConfigService) => ({
+                store: await redisStore({
+                    socket: {
+                        host: configService.getOrThrow<string>("REDIS_HOST"),
+                        port: configService.getOrThrow<number>("REDIS_PORT")
+                    }
+                })
+            }),
+            inject: [ConfigService]
+        })
     ],
     controllers: [AppController],
     providers: [AppService]

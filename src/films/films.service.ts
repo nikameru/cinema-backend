@@ -21,7 +21,7 @@ export class FilmsService {
     }
 
     async findOne(id: number) {
-        return await this.filmRepository.findOne({where: {id}});
+        return await this.filmRepository.findOne({ where: { id } });
     }
 
     async update(id: number, updateFilmDto: UpdateFilmDto) {

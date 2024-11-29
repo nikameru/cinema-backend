@@ -7,5 +7,6 @@ export class SeatEntity {
     id: number;
 
     @ManyToOne(() => RoomEntity, (room) => room.seats, { onDelete: "CASCADE" })
+    @Column()
     room: RoomEntity;
 }

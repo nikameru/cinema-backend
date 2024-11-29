@@ -10,7 +10,9 @@ export class FilmEntity {
     })
     title: string;
 
-    @Column()
+    @Column({
+        name: "release_date"
+    })
     releaseDate: Date;
 
     @Column()
@@ -27,6 +29,8 @@ export class FilmEntity {
     @Column()
     duration: string;
 
-    @Column()
+    @Column({
+        name: "trailer_youtube_link"
+    })
     trailerYoutubeLink: string;
 }
