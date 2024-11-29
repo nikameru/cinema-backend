@@ -40,10 +40,15 @@ export class FilmsController {
             console.log("caching");
             return cachedData;
         }
+
         console.log("fetching from database"); // If not cached, fetch from database and cache it
         const film = await this.filmsService.findOne(+id);
-        if (!film) throw new NotFoundException("Film does not exist");
+        if (!film) {
+            throw new NotFoundException("Film does not exist");
+        }
+
         await this.cacheManager.set(id, film, 1000);
+
         return film;
     }
 
