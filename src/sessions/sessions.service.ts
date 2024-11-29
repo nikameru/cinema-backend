@@ -16,6 +16,22 @@ export class SessionsService {
         return this.sessionRepository.save(createSessionDto);
     }
 
+    async findCurrent(daysOffset?: number) {
+        const targetDate = new Date().setDate(
+            new Date().getDate() + daysOffset
+        );
+        const dateString = new Date(targetDate).toISOString().split("T")[0];
+
+        const queryBuilder =
+            this.sessionRepository.createQueryBuilder("session");
+        queryBuilder.where(`DATE_TRUNC('day', "date") = :dateString`, {
+            dateString
+        });
+        const { entities } = await queryBuilder.getRawAndEntities();
+
+        return entities;
+    }
+
     findAll() {
         return this.sessionRepository.find();
     }

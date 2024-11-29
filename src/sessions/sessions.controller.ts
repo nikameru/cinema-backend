@@ -5,7 +5,8 @@ import {
     Body,
     Patch,
     Param,
-    Delete
+    Delete,
+    Query
 } from "@nestjs/common";
 import { SessionsService } from "./sessions.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
@@ -20,7 +21,13 @@ export class SessionsController {
         return this.sessionsService.create(createSessionDto);
     }
 
-    @Get()
+    @Get("current")
+    findCurrent(@Query("daysOffset") daysOffset?: number) {
+        return this.sessionsService.findCurrent(daysOffset);
+    }
+
+    // For debug
+    @Get("all")
     findAll() {
         return this.sessionsService.findAll();
     }

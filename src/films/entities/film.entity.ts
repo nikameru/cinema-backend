@@ -22,7 +22,7 @@ export class FilmEntity {
     rating: number;
 
     @Column()
-    cast: string[];
+    cast: string;
 
     @Column()
     duration: string;

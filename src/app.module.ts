@@ -14,6 +14,9 @@ import { SeatsModule } from "./seats/seats.module";
 import { RoomsModule } from "./rooms/rooms.module";
 import { RoomEntity } from "./rooms/entities/room.entity";
 import { SeatEntity } from "./seats/entities/seat.entity";
+import { SessionsModule } from "./sessions/sessions.module";
+import { OrderEntity } from "./orders/entities/order.entity";
+import { SessionEntity } from "./sessions/entities/session.entity";
 
 @Module({
     imports: [
@@ -32,10 +35,6 @@ import { SeatEntity } from "./seats/entities/seat.entity";
             },
             isGlobal: true
         }),
-        UsersModule,
-        OrdersModule,
-        FilmsModule,
-        AuthModule,
         TypeOrmModule.forRootAsync({
             useFactory: (configService: ConfigService) => ({
                 type: "postgres",
@@ -44,13 +43,25 @@ import { SeatEntity } from "./seats/entities/seat.entity";
                 username: configService.getOrThrow<string>("POSTGRES_USER"),
                 password: configService.getOrThrow<string>("POSTGRES_PASSWORD"),
                 database: configService.getOrThrow<string>("POSTGRES_DB"),
-                entities: [UserEntity, FilmEntity, RoomEntity, SeatEntity],
+                entities: [
+                    UserEntity,
+                    FilmEntity,
+                    RoomEntity,
+                    SeatEntity,
+                    OrderEntity,
+                    SessionEntity
+                ],
                 synchronize: true
             }),
             inject: [ConfigService]
         }),
         SeatsModule,
-        RoomsModule
+        RoomsModule,
+        UsersModule,
+        OrdersModule,
+        FilmsModule,
+        AuthModule,
+        SessionsModule
     ],
     controllers: [AppController],
     providers: [AppService]
