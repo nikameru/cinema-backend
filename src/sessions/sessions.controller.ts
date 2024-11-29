@@ -22,7 +22,7 @@ export class SessionsController {
     }
 
     @Get("current")
-    findCurrent(@Query("daysOffset") daysOffset?: number) {
+    findCurrent(@Query("daysOffset") daysOffset: number = 0) {
         return this.sessionsService.findCurrent(daysOffset);
     }
 
