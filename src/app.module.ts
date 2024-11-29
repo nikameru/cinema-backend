@@ -11,6 +11,10 @@ import * as Joi from "joi";
 import { FilmEntity } from "./films/entities/film.entity";
 import { AuthModule } from "./auth/auth.module";
 import { SessionsModule } from "./sessions/sessions.module";
+import { SeatsModule } from "./seats/seats.module";
+import { RoomsModule } from "./rooms/rooms.module";
+import { RoomEntity } from "./rooms/entities/room.entity";
+import { SeatEntity } from "./seats/entities/seat.entity";
 
 @Module({
     imports: [
@@ -33,16 +37,18 @@ import { SessionsModule } from "./sessions/sessions.module";
             useFactory: (configService: ConfigService) => ({
                 type: "postgres",
                 host: configService.getOrThrow<string>("DB_HOST"),
-                port: 5432,
-                username: "postgres",
+                port: +configService.getOrThrow<string>("DB_PORT"),
+                username: configService.getOrThrow<string>("DB_USERNAME"),
                 password: configService.getOrThrow<string>("DB_PASSWORD"),
                 database: configService.getOrThrow<string>("DB_NAME"),
-                entities: [UserEntity, FilmEntity],
+                entities: [UserEntity, FilmEntity, RoomEntity, SeatEntity],
                 synchronize: true
             }),
             inject: [ConfigService]
         }),
-        SessionsModule
+        SessionsModule,
+        SeatsModule,
+        RoomsModule
     ],
     controllers: [AppController],
     providers: [AppService]

@@ -21,19 +21,19 @@ export class UsersService {
         return this.userRepository.save(user);
     }
 
-    findAll() {
-        return this.userRepository.find();
+    async findAll() {
+        return await this.userRepository.find();
     }
 
-    findOne(where: FindOptionsWhere<UserEntity>) {
-        return this.userRepository.findOneBy(where);
+    async findOne(where: FindOptionsWhere<UserEntity>) {
+        return await this.userRepository.findOneBy(where);
     }
 
-    update(id: number, updateUserDto: UpdateUserDto) {
-        return this.userRepository.update(id, updateUserDto);
+    async update(id: number, updateUserDto: UpdateUserDto) {
+        return await this.userRepository.update(id, updateUserDto);
     }
 
-    remove(id: number) {
-        return this.userRepository.delete(id);
+    async remove(id: number) {
+        return await this.userRepository.delete(id);
     }
 }
