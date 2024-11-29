@@ -1,4 +1,4 @@
 import { OmitType } from "@nestjs/mapped-types";
-import { UserEntity } from "../entities/user.entity";
+import { UserDto } from "./user.dto";
 
-export class CreateUserDto extends OmitType(UserEntity, ["id" as const]) {}
+export class CreateUserDto extends OmitType(UserDto, ["id" as const]) {}
