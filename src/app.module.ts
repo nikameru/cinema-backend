@@ -24,6 +24,8 @@ import { FilmEntity } from "./films/entities/film.entity";
             isGlobal: true
         }),
         UsersModule,
+        OrdersModule,
+        FilmsModule,
         TypeOrmModule.forRootAsync({
             useFactory: (configService: ConfigService) => ({
                 type: "postgres",
@@ -31,7 +33,7 @@ import { FilmEntity } from "./films/entities/film.entity";
                 port: 5432,
                 username: "postgres",
                 password: configService.getOrThrow<string>("DB_PASSWORD"),
-                database: "cinema",
+                database: "cinemadb",
                 entities: [UserEntity, FilmEntity],
                 synchronize: true
             }),

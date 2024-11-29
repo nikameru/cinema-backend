@@ -1,3 +1,4 @@
+import { FilmEntity } from "src/films/entities/film.entity";
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({
