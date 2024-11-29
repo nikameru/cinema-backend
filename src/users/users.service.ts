@@ -3,7 +3,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "./entities/user.entity";
-import { Repository } from "typeorm";
+import { FindOptionsWhere, Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
 
 @Injectable()
@@ -25,8 +25,8 @@ export class UsersService {
         return this.userRepository.find();
     }
 
-    findOne(id: number) {
-        return this.userRepository.findOneBy({ id });
+    findOne(where: FindOptionsWhere<UserEntity>) {
+        return this.userRepository.findOneBy(where);
     }
 
     update(id: number, updateUserDto: UpdateUserDto) {
