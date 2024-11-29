@@ -9,25 +9,24 @@ import { OrdersModule } from "./orders/orders.module";
 import { FilmsModule } from "./films/films.module";
 import * as Joi from "joi";
 import { FilmEntity } from "./films/entities/film.entity";
-import { AuthModule } from "./auth/auth.module";
-import { SeatsModule } from "./seats/seats.module";
-import { RoomsModule } from "./rooms/rooms.module";
+import { AuthModule } from './auth/auth.module';
+import { SeatsModule } from './seats/seats.module';
+import { RoomsModule } from './rooms/rooms.module';
 import { RoomEntity } from "./rooms/entities/room.entity";
 import { SeatEntity } from "./seats/entities/seat.entity";
 import { SessionsModule } from "./sessions/sessions.module";
 import { OrderEntity } from "./orders/entities/order.entity";
 import { SessionEntity } from "./sessions/entities/session.entity";
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
+
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             validationSchema: Joi.object({
                 PORT: Joi.number().port().default(3000),
-                POSTGRES_HOST: Joi.string().hostname(),
-                POSTGRES_PORT: Joi.number().port().default(5432),
-                POSTGRES_PASSWORD: Joi.string(),
-                POSTGRES_USER: Joi.string(),
-                POSTGRES_DB: Joi.string()
+                DB_PASSWORD: Joi.string().required()
             }),
             validationOptions: {
                 allowUnknown: true,
@@ -35,6 +34,10 @@ import { SessionEntity } from "./sessions/entities/session.entity";
             },
             isGlobal: true
         }),
+        UsersModule,
+        OrdersModule,
+        FilmsModule,
+        AuthModule,
         TypeOrmModule.forRootAsync({
             useFactory: (configService: ConfigService) => ({
                 type: "postgres",
@@ -43,25 +46,13 @@ import { SessionEntity } from "./sessions/entities/session.entity";
                 username: configService.getOrThrow<string>("POSTGRES_USER"),
                 password: configService.getOrThrow<string>("POSTGRES_PASSWORD"),
                 database: configService.getOrThrow<string>("POSTGRES_DB"),
-                entities: [
-                    UserEntity,
-                    FilmEntity,
-                    RoomEntity,
-                    SeatEntity,
-                    OrderEntity,
-                    SessionEntity
-                ],
+                entities: [UserEntity, FilmEntity, RoomEntity, SeatEntity],
                 synchronize: true
             }),
             inject: [ConfigService]
         }),
         SeatsModule,
-        RoomsModule,
-        UsersModule,
-        OrdersModule,
-        FilmsModule,
-        AuthModule,
-        SessionsModule
+        RoomsModule
     ],
     controllers: [AppController],
     providers: [AppService]
