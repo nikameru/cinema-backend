@@ -5,7 +5,9 @@ import { UsersModule } from "./users/users.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserEntity } from "./users/entities/user.entity";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { FilmsModule } from './films/films.module';
 import * as Joi from "joi";
+import { FilmEntity } from "./films/entities/film.entity";
 
 @Module({
     imports: [
@@ -28,12 +30,13 @@ import * as Joi from "joi";
                 port: 5432,
                 username: "postgres",
                 password: configService.getOrThrow<string>("DB_PASSWORD"),
-                database: "cinemadb",
-                entities: [UserEntity],
+                database: "cinema",
+                entities: [UserEntity, FilmEntity],
                 synchronize: true
             }),
             inject: [ConfigService]
-        })
+        }),
+        FilmsModule
     ],
     controllers: [AppController],
     providers: [AppService]
