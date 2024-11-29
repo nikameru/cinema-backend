@@ -11,24 +11,24 @@ export class FilmsService {
         @InjectRepository(FilmEntity)
         private readonly filmRepository: Repository<FilmEntity>
     ) {}
-    create(createFilmDto: CreateFilmDto) {
+    async create(createFilmDto: CreateFilmDto) {
         const film = this.filmRepository.create(createFilmDto);
-        return this.filmRepository.save(film);
+        return await this.filmRepository.save(film);
     }
 
-    findAll() {
-        return this.filmRepository.find();
+    async findAll() {
+        return await this.filmRepository.find();
     }
 
-    findOne(id: number) {
-        return this.filmRepository.findOneBy({ id });
+    async findOne(id: number) {
+        return await this.filmRepository.findOne({where: {id}});
     }
 
-    update(id: number, updateFilmDto: UpdateFilmDto) {
-        return this.filmRepository.update(id, updateFilmDto);
+    async update(id: number, updateFilmDto: UpdateFilmDto) {
+        return await this.filmRepository.update(id, updateFilmDto);
     }
 
-    remove(id: number) {
-        return this.filmRepository.delete(id);
+    async remove(id: number) {
+        return await this.filmRepository.delete(id);
     }
 }
