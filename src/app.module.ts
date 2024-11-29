@@ -9,6 +9,7 @@ import { OrdersModule } from "./orders/orders.module";
 import { FilmsModule } from "./films/films.module";
 import * as Joi from "joi";
 import { FilmEntity } from "./films/entities/film.entity";
+import { AuthModule } from './auth/auth.module';
 
 @Module({
     imports: [
@@ -26,6 +27,7 @@ import { FilmEntity } from "./films/entities/film.entity";
         UsersModule,
         OrdersModule,
         FilmsModule,
+        AuthModule,
         TypeOrmModule.forRootAsync({
             useFactory: (configService: ConfigService) => ({
                 type: "postgres",
@@ -33,7 +35,7 @@ import { FilmEntity } from "./films/entities/film.entity";
                 port: 5432,
                 username: "postgres",
                 password: configService.getOrThrow<string>("DB_PASSWORD"),
-                database: "cinemadb",
+                database: configService.getOrThrow<string>("DB_NAME"),
                 entities: [UserEntity, FilmEntity],
                 synchronize: true
             }),
