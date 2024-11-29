@@ -5,6 +5,7 @@ import { UsersModule } from "./users/users.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserEntity } from "./users/entities/user.entity";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { OrdersModule } from "./orders/orders.module";
 import * as Joi from "joi";
 
 @Module({
@@ -33,7 +34,8 @@ import * as Joi from "joi";
                 synchronize: true
             }),
             inject: [ConfigService]
-        })
+        }),
+        OrdersModule
     ],
     controllers: [AppController],
     providers: [AppService]
