@@ -14,11 +14,9 @@ import { SeatsModule } from './seats/seats.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { RoomEntity } from "./rooms/entities/room.entity";
 import { SeatEntity } from "./seats/entities/seat.entity";
-import { SessionsModule } from "./sessions/sessions.module";
-import { OrderEntity } from "./orders/entities/order.entity";
-import { SessionEntity } from "./sessions/entities/session.entity";
 import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-redis-store';
+import { redisStore } from 'cache-manager-redis-yet';
+import { OrderEntity } from "./orders/entities/order.entity";
 
 
 @Module({
@@ -26,7 +24,11 @@ import * as redisStore from 'cache-manager-redis-store';
         ConfigModule.forRoot({
             validationSchema: Joi.object({
                 PORT: Joi.number().port().default(3000),
-                DB_PASSWORD: Joi.string().required()
+                POSTGRES_HOST: Joi.string().hostname(),
+                POSTGRES_PORT: Joi.number().port().default(5432),
+                POSTGRES_PASSWORD: Joi.string(),
+                POSTGRES_USER: Joi.string(),
+                POSTGRES_DB: Joi.string()
             }),
             validationOptions: {
                 allowUnknown: true,
@@ -38,21 +40,33 @@ import * as redisStore from 'cache-manager-redis-store';
         OrdersModule,
         FilmsModule,
         AuthModule,
+        SeatsModule,
+        RoomsModule,
         TypeOrmModule.forRootAsync({
-            useFactory: (configService: ConfigService) => ({
+            useFactory: async (configService: ConfigService) => ({
                 type: "postgres",
                 host: configService.getOrThrow<string>("POSTGRES_HOST"),
-                port: configService.getOrThrow<number>("POSTGRES_PORT"),
+                port: +configService.getOrThrow<string>("POSTGRES_PORT"),
                 username: configService.getOrThrow<string>("POSTGRES_USER"),
                 password: configService.getOrThrow<string>("POSTGRES_PASSWORD"),
                 database: configService.getOrThrow<string>("POSTGRES_DB"),
-                entities: [UserEntity, FilmEntity, RoomEntity, SeatEntity],
+                entities: [UserEntity, FilmEntity, RoomEntity, SeatEntity, OrderEntity],
                 synchronize: true
             }),
             inject: [ConfigService]
         }),
-        SeatsModule,
-        RoomsModule
+        CacheModule.registerAsync({  
+            isGlobal: true,  
+            useFactory: async (configService: ConfigService) => ({  
+              store: await redisStore({  
+                socket: {  
+                  host: configService.getOrThrow<string>("REDIS_HOST"),  
+                  port: +configService.getOrThrow<string>("REDIS_PORT")
+                },        
+              }),      
+            }),   
+            inject: [ConfigService] 
+          }),    
     ],
     controllers: [AppController],
     providers: [AppService]
