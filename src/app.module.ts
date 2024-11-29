@@ -10,7 +10,6 @@ import { FilmsModule } from "./films/films.module";
 import * as Joi from "joi";
 import { FilmEntity } from "./films/entities/film.entity";
 import { AuthModule } from "./auth/auth.module";
-import { SessionsModule } from "./sessions/sessions.module";
 import { SeatsModule } from "./seats/seats.module";
 import { RoomsModule } from "./rooms/rooms.module";
 import { RoomEntity } from "./rooms/entities/room.entity";
@@ -21,7 +20,11 @@ import { SeatEntity } from "./seats/entities/seat.entity";
         ConfigModule.forRoot({
             validationSchema: Joi.object({
                 PORT: Joi.number().port().default(3000),
-                DB_PASSWORD: Joi.string().required()
+                POSTGRES_HOST: Joi.string().hostname(),
+                POSTGRES_PORT: Joi.number().port().default(5432),
+                POSTGRES_PASSWORD: Joi.string(),
+                POSTGRES_USER: Joi.string(),
+                POSTGRES_DB: Joi.string()
             }),
             validationOptions: {
                 allowUnknown: true,
@@ -36,17 +39,16 @@ import { SeatEntity } from "./seats/entities/seat.entity";
         TypeOrmModule.forRootAsync({
             useFactory: (configService: ConfigService) => ({
                 type: "postgres",
-                host: configService.getOrThrow<string>("DB_HOST"),
-                port: +configService.getOrThrow<string>("DB_PORT"),
-                username: configService.getOrThrow<string>("DB_USERNAME"),
-                password: configService.getOrThrow<string>("DB_PASSWORD"),
-                database: configService.getOrThrow<string>("DB_NAME"),
+                host: configService.getOrThrow<string>("POSTGRES_HOST"),
+                port: configService.getOrThrow<number>("POSTGRES_PORT"),
+                username: configService.getOrThrow<string>("POSTGRES_USER"),
+                password: configService.getOrThrow<string>("POSTGRES_PASSWORD"),
+                database: configService.getOrThrow<string>("POSTGRES_DB"),
                 entities: [UserEntity, FilmEntity, RoomEntity, SeatEntity],
                 synchronize: true
             }),
             inject: [ConfigService]
         }),
-        SessionsModule,
         SeatsModule,
         RoomsModule
     ],
