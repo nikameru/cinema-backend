@@ -6,6 +6,6 @@ export class RoomEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToMany(() => SeatEntity, (seat) => seat.room, { cascade: true })
+    @OneToMany(() => SeatEntity, (seat) => seat.roomId, { cascade: true })
     seats: SeatEntity[];
 }

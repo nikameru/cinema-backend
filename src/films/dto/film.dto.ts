@@ -9,6 +9,9 @@ export class FilmDto extends FilmEntity {
     title: string;
 
     @IsString()
+    coverLink: string;
+
+    @IsString()
     releaseDate: Date;
 
     @IsString()

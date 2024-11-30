@@ -11,6 +11,11 @@ export class FilmEntity {
     title: string;
 
     @Column({
+        name: "cover_link"
+    })
+    coverLink: string;
+
+    @Column({
         name: "release_date"
     })
     releaseDate: Date;
