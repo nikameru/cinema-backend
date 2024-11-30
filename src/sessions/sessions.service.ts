@@ -24,10 +24,13 @@ export class SessionsService {
 
         const queryBuilder =
             this.sessionRepository.createQueryBuilder("session");
-        queryBuilder.where(`DATE_TRUNC('day', "date") = :dateString`, {
-            dateString
-        });
-        const { entities } = await queryBuilder.getRawAndEntities();
+        const entities = await queryBuilder
+            .where(`DATE_TRUNC('day', "date") = :dateString`, {
+                dateString
+            })
+            .leftJoinAndSelect("session.film", "film")
+            .leftJoinAndSelect("session.room", "room")
+            .getMany();
 
         return entities;
     }

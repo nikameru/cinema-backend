@@ -16,17 +16,13 @@ export class SessionEntity {
     id: number;
 
     @OneToOne(() => FilmEntity, (film) => film.id)
-    @JoinColumn({
-        name: "film_id"
-    })
-    filmId: number;
+    @JoinColumn()
+    film: number;
 
     @Column()
     date: Date;
 
     @OneToOne(() => RoomEntity, (room) => room.id)
-    @JoinColumn({
-        name: "room_id"
-    })
-    roomId: number;
+    @JoinColumn()
+    room: RoomEntity;
 }
