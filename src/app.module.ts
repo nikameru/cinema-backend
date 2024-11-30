@@ -17,6 +17,8 @@ import { SeatEntity } from "./seats/entities/seat.entity";
 import { CacheModule } from "@nestjs/cache-manager";
 import { redisStore } from "cache-manager-redis-yet";
 import { OrderEntity } from "./orders/entities/order.entity";
+import { SessionsModule } from "./sessions/sessions.module";
+import { SessionEntity } from "./sessions/entities/session.entity";
 
 @Module({
     imports: [
@@ -35,12 +37,6 @@ import { OrderEntity } from "./orders/entities/order.entity";
             },
             isGlobal: true
         }),
-        UsersModule,
-        OrdersModule,
-        FilmsModule,
-        AuthModule,
-        SeatsModule,
-        RoomsModule,
         TypeOrmModule.forRootAsync({
             useFactory: async (configService: ConfigService) => ({
                 type: "postgres",
@@ -54,7 +50,8 @@ import { OrderEntity } from "./orders/entities/order.entity";
                     FilmEntity,
                     RoomEntity,
                     SeatEntity,
-                    OrderEntity
+                    OrderEntity,
+                    SessionEntity
                 ],
                 synchronize: true
             }),
@@ -71,7 +68,14 @@ import { OrderEntity } from "./orders/entities/order.entity";
                 })
             }),
             inject: [ConfigService]
-        })
+        }),
+        UsersModule,
+        OrdersModule,
+        FilmsModule,
+        AuthModule,
+        SeatsModule,
+        RoomsModule,
+        SessionsModule
     ],
     controllers: [AppController],
     providers: [AppService]

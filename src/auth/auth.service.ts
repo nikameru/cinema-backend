@@ -10,14 +10,20 @@ export class AuthService {
         private readonly jwtService: JwtService
     ) {}
 
-    async signIn(username: string, pass: string): Promise<any> {
+    async signIn(username: string, password: string) {
         const user = await this.usersService.findOne({ username });
-        if (!(await bcrypt.compare(pass, user.password))) {
+        if (!user) {
             throw new UnauthorizedException();
         }
-        const payload = { username: user.username, sub: user.id };
+
+        const isAuthenticated = await bcrypt.compare(password, user.password);
+        if (!isAuthenticated) {
+            throw new UnauthorizedException();
+        }
+
+        const tokenPayload = { username: user.username, sub: user.id };
         return {
-            accessToken: await this.jwtService.signAsync(payload)
+            accessToken: await this.jwtService.signAsync(tokenPayload)
         };
     }
 }
