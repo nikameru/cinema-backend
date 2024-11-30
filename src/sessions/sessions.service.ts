@@ -16,7 +16,7 @@ export class SessionsService {
         return this.sessionRepository.save(createSessionDto);
     }
 
-    async findCurrent(daysOffset?: number) {
+    async findCurrent(daysOffset: number) {
         const targetDate = new Date().setDate(
             new Date().getDate() + daysOffset
         );

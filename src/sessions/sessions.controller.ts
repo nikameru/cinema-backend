@@ -11,6 +11,7 @@ import {
 import { SessionsService } from "./sessions.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
+import { GetCurrentSessionsDto } from "./dto/get-current-sessions.dto";
 
 @Controller("sessions")
 export class SessionsController {
@@ -22,8 +23,10 @@ export class SessionsController {
     }
 
     @Get("current")
-    findCurrent(@Query("daysOffset") daysOffset: number = 0) {
-        return this.sessionsService.findCurrent(daysOffset);
+    findCurrent(@Query() getCurrentSessionsDto: GetCurrentSessionsDto) {
+        return this.sessionsService.findCurrent(
+            getCurrentSessionsDto.daysOffset
+        );
     }
 
     // For debug
