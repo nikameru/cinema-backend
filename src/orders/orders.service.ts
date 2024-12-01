@@ -1,48 +1,85 @@
-import { ConflictException, Inject, Injectable } from "@nestjs/common";
+import {
+    BadRequestException,
+    ConflictException,
+    Inject,
+    Injectable
+} from "@nestjs/common";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { UpdateOrderDto } from "./dto/update-order.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { OrderEntity } from "./entities/order.entity";
-import { FindOptionsWhere, Repository } from "typeorm";
+import {
+    FindManyOptions,
+    FindOptionsWhere,
+    MoreThanOrEqual,
+    Repository
+} from "typeorm";
 import { CACHE_MANAGER, CacheStore } from "@nestjs/cache-manager";
 import {
     REDIS_KEY_DELIMITER,
     REDIS_ORDERS_PREFIX
 } from "src/constants/constants";
+import { UsersService } from "src/users/users.service";
+import { SessionsService } from "src/sessions/sessions.service";
 
 @Injectable()
 export class OrdersService {
     constructor(
         @InjectRepository(OrderEntity)
         private readonly orderRepository: Repository<OrderEntity>,
-        @Inject(CACHE_MANAGER)
-        private readonly cacheManager: CacheStore
+        @Inject() private readonly usersService: UsersService,
+        @Inject() private readonly sessionsService: SessionsService,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore
     ) {}
 
     async createReservation(createOrderDto: CreateOrderDto) {
-        const reservation = await this.cacheManager.get(
-            this.getCacheKey(createOrderDto.userId)
-        );
-        if (reservation) {
+        const existingReservation = await this.orderRepository.existsBy({
+            userId: createOrderDto.userId,
+            isPaid: false,
+            reservationExpiresAt: MoreThanOrEqual(new Date())
+        });
+        if (existingReservation) {
             throw new ConflictException(
                 "You can't make multiple reservations at once"
             );
         }
 
-        await this.cacheManager.set(
-            this.getCacheKey(createOrderDto.userId),
-            createOrderDto,
-            15 * 1000
-        );
+        const user = await this.usersService.findOne({
+            id: createOrderDto.userId
+        });
+        if (!user) {
+            throw new BadRequestException("User not found");
+        }
+        const session = await this.sessionsService.findOne({
+            id: createOrderDto.sessionId
+        });
+        if (!session) {
+            throw new BadRequestException("Session not found");
+        }
+
+        const reservation = this.orderRepository.create({
+            user,
+            session,
+            ...createOrderDto
+        });
+
+        await this.orderRepository.save(reservation);
     }
 
     async createOrder(userId: number) {
-        const reservation = await this.cacheManager.get<CreateOrderDto>(
+        const reservation = await this.cacheManager.get<OrderEntity>(
             this.getCacheKey(userId)
         );
-        await this.cacheManager.del(this.getCacheKey(userId));
+        if (!reservation) {
+            throw new ConflictException(
+                "Wrong order flow! No reservation has been made"
+            );
+        }
+        this.cacheManager.del(this.getCacheKey(userId));
 
-        return this.orderRepository.save(reservation);
+        reservation.date = new Date();
+
+        return await this.orderRepository.save(reservation);
     }
 
     findAll() {
@@ -50,7 +87,14 @@ export class OrdersService {
     }
 
     findOne(where: FindOptionsWhere<OrderEntity>) {
-        return this.orderRepository.findOneBy(where);
+        return this.orderRepository.findOne({
+            where,
+            relations: ["user", "session"]
+        });
+    }
+
+    findMany(options: FindManyOptions<OrderEntity>) {
+        return this.orderRepository.find(options);
     }
 
     update(id: number, updateOrderDto: UpdateOrderDto) {

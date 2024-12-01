@@ -11,15 +11,17 @@ import {
     REDIS_KEY_DELIMITER,
     REDIS_SESSIONS_PREFIX
 } from "src/constants/constants";
+import { OrdersService } from "src/orders/orders.service";
 
 @Injectable()
 export class SessionsService {
     constructor(
+        @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore,
         @InjectRepository(SessionEntity)
         private readonly sessionRepository: Repository<SessionEntity>,
         @Inject() private readonly filmsService: FilmsService,
         @Inject() private readonly roomsService: RoomsService,
-        @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore
+        @Inject() private readonly ordersService: OrdersService
     ) {}
 
     async create(createSessionDto: CreateSessionDto) {
@@ -90,6 +92,19 @@ export class SessionsService {
 
     remove(id: number) {
         return this.sessionRepository.delete(id);
+    }
+
+    async getOccupiedSeats(id: number) {
+        const isValidSession = await this.sessionRepository.existsBy({ id });
+        if (!isValidSession) {
+            throw new BadRequestException("Session doesn't exist");
+        }
+
+        const occupiedSeats = await this.ordersService.findMany({
+            select: { seatIds: true },
+            where: { sessionId: id }
+        });
+        return occupiedSeats;
     }
 
     private getCacheKey(id: string): string {
