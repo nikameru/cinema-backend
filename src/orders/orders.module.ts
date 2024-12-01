@@ -6,6 +6,7 @@ import { OrderEntity } from "./entities/order.entity";
 import { JwtModule } from "@nestjs/jwt";
 import { UsersModule } from "src/users/users.module";
 import { SessionsModule } from "src/sessions/sessions.module";
+import { TicketsService } from "./tickets/tickets.service";
 
 @Module({
     imports: [
@@ -15,7 +16,7 @@ import { SessionsModule } from "src/sessions/sessions.module";
         JwtModule
     ],
     controllers: [OrdersController],
-    providers: [OrdersService],
+    providers: [OrdersService, TicketsService],
     exports: [OrdersService]
 })
 export class OrdersModule {}
