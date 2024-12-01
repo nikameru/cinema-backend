@@ -5,10 +5,11 @@ import { SessionEntity } from "./entities/session.entity";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { FilmsModule } from "src/films/films.module";
 import { RoomsModule } from "src/rooms/rooms.module";
+import { OrderEntity } from "src/orders/entities/order.entity";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([SessionEntity]),
+        TypeOrmModule.forFeature([SessionEntity, OrderEntity]),
         FilmsModule,
         RoomsModule
     ],

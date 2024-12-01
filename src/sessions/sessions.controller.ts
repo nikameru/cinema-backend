@@ -52,4 +52,9 @@ export class SessionsController {
     remove(@Param("id") id: string) {
         return this.sessionsService.remove(+id);
     }
+
+    @Get(":id/occupied")
+    async getOccupiedSeats(@Param("id") id: number) {
+        return this.sessionsService.getOccupiedSeats(id);
+    }
 }

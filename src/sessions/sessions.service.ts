@@ -8,6 +8,7 @@ import { FilmsService } from "src/films/films.service";
 import { RoomsService } from "src/rooms/rooms.service";
 import { CACHE_MANAGER, CacheStore } from "@nestjs/cache-manager";
 import { REDIS_KEY_DELIMITER, REDIS_SESSIONS_PREFIX } from "src/constants/constants";
+import { OrderEntity } from "src/orders/entities/order.entity";
 
 @Injectable()
 export class SessionsService {
@@ -16,7 +17,9 @@ export class SessionsService {
         private readonly sessionRepository: Repository<SessionEntity>,
         @Inject() private readonly filmsService: FilmsService,
         @Inject() private readonly roomsService: RoomsService,
-        @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore
+        @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore,
+        @InjectRepository(OrderEntity)
+        private readonly orderRepository: Repository<OrderEntity>
     ) {}
 
     async create(createSessionDto: CreateSessionDto) {
@@ -97,6 +100,17 @@ export class SessionsService {
 
     remove(id: number) {
         return this.sessionRepository.delete(id);
+    }
+
+    async getOccupiedSeats(id: number){
+        const isValidSession = await this.orderRepository.existsBy({ id });
+        if(!isValidSession){
+            throw new BadRequestException("Session is not valid");
+        }
+
+        const occupiedSeats = await this.orderRepository.find( { select: { seats: true }, where: { id } } )
+
+        return occupiedSeats;
     }
 
     private getCacheKey(id: string | FindOptionsWhere<SessionEntity>): string {
