@@ -16,7 +16,6 @@ import {
     Repository
 } from "typeorm";
 import { CACHE_MANAGER, CacheStore } from "@nestjs/cache-manager";
-import { TicketsService } from "./tickets/tickets.service";
 import {
     REDIS_KEY_DELIMITER,
     REDIS_ORDERS_PREFIX
@@ -29,7 +28,7 @@ export class OrdersService {
     constructor(
         @InjectRepository(OrderEntity)
         private readonly orderRepository: Repository<OrderEntity>,
-        @Inject() private readonly usersService: UsersService,
+        private readonly usersService: UsersService,
         @Inject(forwardRef(() => SessionsService))
         private readonly sessionsService: SessionsService,
         @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore
@@ -65,6 +64,9 @@ export class OrdersService {
             session,
             ...createOrderDto
         });
+
+        reservation.isPaid = false;
+        //reservation.reservationExpiresAt = new Date().setMinutes(new Date().getMinutes() + 15);
 
         await this.orderRepository.save(reservation);
     }

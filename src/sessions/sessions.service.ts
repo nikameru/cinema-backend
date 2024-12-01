@@ -24,8 +24,8 @@ export class SessionsService {
         @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore,
         @InjectRepository(SessionEntity)
         private readonly sessionRepository: Repository<SessionEntity>,
-        @Inject() private readonly filmsService: FilmsService,
-        @Inject() private readonly roomsService: RoomsService,
+        private readonly filmsService: FilmsService,
+        private readonly roomsService: RoomsService,
         @Inject(forwardRef(() => OrdersService))
         private readonly ordersService: OrdersService
     ) {}

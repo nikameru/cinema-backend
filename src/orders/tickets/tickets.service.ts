@@ -2,13 +2,13 @@ import { Injectable, InternalServerErrorException } from "@nestjs/common";
 import * as qrcode from "qrcode";
 import * as canvas from "canvas";
 import * as fs from "fs";
-import { OrderDto } from "../dto/order.dto";
 import { OrdersService } from "../orders.service";
 import { OrderEntity } from "../entities/order.entity";
 
 @Injectable()
 export class TicketsService {
     constructor(private readonly ordersService: OrdersService) {}
+
     async getTickets(id: number) {
         const order = await this.ordersService.findOne({ id });
         fs.readFile(`./ticket${order.id}.jpeg`, async (error, data) => {
@@ -128,7 +128,7 @@ export class TicketsService {
         let rot = (Math.PI / 2) * 3;
         let x = cx;
         let y = cy;
-        let step = Math.PI / spikes;
+        const step = Math.PI / spikes;
 
         ctx.beginPath();
         ctx.moveTo(cx, cy - outerRadius);
