@@ -1,12 +1,9 @@
-import { SeatEntity } from "src/seats/entities/seat.entity";
 import { SessionEntity } from "src/sessions/entities/session.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import {
     Column,
     Entity,
     JoinColumn,
-    JoinTable,
-    ManyToMany,
     ManyToOne,
     OneToOne,
     PrimaryGeneratedColumn
@@ -40,9 +37,8 @@ export class OrderEntity {
     @Column()
     date: Date;
 
-    @ManyToMany(() => SeatEntity, { eager: true })
-    @JoinTable()
-    seats: SeatEntity[];
+    @Column("int", { array: true })
+    seatIds: number[];
 
     @Column({
         default: false

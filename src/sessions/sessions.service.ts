@@ -6,6 +6,8 @@ import { SessionEntity } from "./entities/session.entity";
 import { FindOptionsWhere, Repository } from "typeorm";
 import { FilmsService } from "src/films/films.service";
 import { RoomsService } from "src/rooms/rooms.service";
+import { CACHE_MANAGER, CacheStore } from "@nestjs/cache-manager";
+import { REDIS_KEY_DELIMITER, REDIS_SESSIONS_PREFIX } from "src/constants/constants";
 
 @Injectable()
 export class SessionsService {
@@ -13,7 +15,8 @@ export class SessionsService {
         @InjectRepository(SessionEntity)
         private readonly sessionRepository: Repository<SessionEntity>,
         @Inject() private readonly filmsService: FilmsService,
-        @Inject() private readonly roomsService: RoomsService
+        @Inject() private readonly roomsService: RoomsService,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore
     ) {}
 
     async create(createSessionDto: CreateSessionDto) {
@@ -41,6 +44,13 @@ export class SessionsService {
         );
         const dateString = new Date(targetDate).toISOString().split("T")[0];
 
+        const cachedData = await this.cacheManager.get<SessionEntity>(
+            this.getCacheKey(dateString)
+        );
+        if (cachedData) {
+            return cachedData;
+        }
+
         const queryBuilder =
             this.sessionRepository.createQueryBuilder("session");
         const entities = await queryBuilder
@@ -51,6 +61,12 @@ export class SessionsService {
             .leftJoinAndSelect("session.room", "room")
             .getMany();
 
+        await this.cacheManager.set<SessionEntity[]>(
+            this.getCacheKey(dateString),
+            entities,
+            30000
+        );
+
         return entities;
     }
 
@@ -58,8 +74,21 @@ export class SessionsService {
         return this.sessionRepository.find({ relations: ["film"] });
     }
 
-    findOne(where: FindOptionsWhere<SessionEntity>) {
-        return this.sessionRepository.findOne({ where, relations: ["film"] });
+    async findOne(where: FindOptionsWhere<SessionEntity>) {
+        const cachedData = await this.cacheManager.get<SessionEntity>(
+            this.getCacheKey(where)
+        );
+        if(cachedData){
+            return cachedData;
+        }
+
+        const entity = await this.sessionRepository.findOne({where, relations: ["film"] });
+        await this.cacheManager.set<SessionEntity>(
+            this.getCacheKey(where),
+            entity,
+            30000
+        )
+        return entity;
     }
 
     update(id: number, updateSessionDto: UpdateSessionDto) {
@@ -68,5 +97,9 @@ export class SessionsService {
 
     remove(id: number) {
         return this.sessionRepository.delete(id);
+    }
+
+    private getCacheKey(id: string | FindOptionsWhere<SessionEntity>): string {
+        return `${REDIS_SESSIONS_PREFIX}${REDIS_KEY_DELIMITER}${id}`;
     }
 }

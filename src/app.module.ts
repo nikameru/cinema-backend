@@ -10,10 +10,8 @@ import { FilmsModule } from "./films/films.module";
 import * as Joi from "joi";
 import { FilmEntity } from "./films/entities/film.entity";
 import { AuthModule } from "./auth/auth.module";
-import { SeatsModule } from "./seats/seats.module";
 import { RoomsModule } from "./rooms/rooms.module";
 import { RoomEntity } from "./rooms/entities/room.entity";
-import { SeatEntity } from "./seats/entities/seat.entity";
 import { CacheModule } from "@nestjs/cache-manager";
 import { redisStore } from "cache-manager-redis-yet";
 import { OrderEntity } from "./orders/entities/order.entity";
@@ -45,14 +43,7 @@ import { SessionEntity } from "./sessions/entities/session.entity";
                 username: configService.getOrThrow<string>("POSTGRES_USER"),
                 password: configService.getOrThrow<string>("POSTGRES_PASSWORD"),
                 database: configService.getOrThrow<string>("POSTGRES_DB"),
-                entities: [
-                    UserEntity,
-                    FilmEntity,
-                    RoomEntity,
-                    SeatEntity,
-                    OrderEntity,
-                    SessionEntity
-                ],
+                entities: [UserEntity, FilmEntity, RoomEntity, OrderEntity, SessionEntity],
                 synchronize: true
             }),
             inject: [ConfigService]
@@ -73,7 +64,6 @@ import { SessionEntity } from "./sessions/entities/session.entity";
         OrdersModule,
         FilmsModule,
         AuthModule,
-        SeatsModule,
         RoomsModule,
         SessionsModule
     ],
