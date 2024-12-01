@@ -34,7 +34,6 @@ export class FilmsService {
             return cachedData;
         }
 
-        console.log("fetching from database");
         // If not cached, fetch from database and cache it
         const film = await this.filmRepository.findOneBy({ id });
         if (!film) {
