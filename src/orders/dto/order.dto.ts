@@ -9,7 +9,7 @@ export class OrderDto extends OrderEntity {
     userId: number;
 
     @IsNumber()
-    filmId: number;
+    sessionId: number;
 
     @IsNumber()
     roomId: number;

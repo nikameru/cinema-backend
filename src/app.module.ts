@@ -43,7 +43,13 @@ import { SessionEntity } from "./sessions/entities/session.entity";
                 username: configService.getOrThrow<string>("POSTGRES_USER"),
                 password: configService.getOrThrow<string>("POSTGRES_PASSWORD"),
                 database: configService.getOrThrow<string>("POSTGRES_DB"),
-                entities: [UserEntity, FilmEntity, RoomEntity, OrderEntity, SessionEntity],
+                entities: [
+                    UserEntity,
+                    FilmEntity,
+                    RoomEntity,
+                    OrderEntity,
+                    SessionEntity
+                ],
                 synchronize: true
             }),
             inject: [ConfigService]
