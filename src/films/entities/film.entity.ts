@@ -12,6 +12,11 @@ export class FilmEntity {
     title: string;
 
     @Column({
+        nullable: true
+    })
+    description: string;
+
+    @Column({
         name: "cover_link"
     })
     coverLink: string;
