@@ -71,7 +71,7 @@ export class OrdersService {
             new Date().setMinutes(new Date().getMinutes() + 15)
         );
 
-        return await this.orderRepository.save(reservation);
+        await this.orderRepository.save(reservation);
     }
 
     async createOrder(userId: number) {
