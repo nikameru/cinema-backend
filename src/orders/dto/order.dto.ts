@@ -6,8 +6,11 @@ export class OrderDto extends OrderEntity {
     id: number;
 
     @IsNumber()
-    userId: string;
+    userId: number;
 
     @IsNumber()
-    filmId: string;
+    filmId: number;
+
+    @IsNumber()
+    roomId: number;
 }

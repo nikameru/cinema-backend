@@ -18,16 +18,12 @@ export class OrderEntity {
     id: number;
 
     @OneToOne(() => UserEntity, (user) => user.id)
-    @JoinColumn({
-        name: "user_id"
-    })
-    userId: string;
+    @JoinColumn()
+    user: UserEntity;
 
     @OneToOne(() => FilmEntity, (film) => film.id)
-    @JoinColumn({
-        name: "film_id"
-    })
-    filmId: string;
+    @JoinColumn()
+    film: FilmEntity;
 
     @Column()
     date: Date;

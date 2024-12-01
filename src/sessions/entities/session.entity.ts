@@ -4,7 +4,7 @@ import {
     Column,
     Entity,
     JoinColumn,
-    OneToOne,
+    ManyToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
 
@@ -15,14 +15,24 @@ export class SessionEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => FilmEntity, (film) => film.id)
+    @Column({
+        nullable: true
+    })
+    filmId: number;
+
+    @ManyToOne(() => FilmEntity, (film) => film.sessions)
     @JoinColumn()
-    film: number;
+    film: FilmEntity;
 
     @Column()
     date: Date;
 
-    @OneToOne(() => RoomEntity, (room) => room.id)
+    @Column({
+        nullable: true
+    })
+    roomId: number;
+
+    @ManyToOne(() => RoomEntity, (room) => room.sessions)
     @JoinColumn()
     room: RoomEntity;
 }
