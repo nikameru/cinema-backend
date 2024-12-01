@@ -5,25 +5,14 @@ import {
     Body,
     Patch,
     Param,
-    Delete,
-    Inject
+    Delete
 } from "@nestjs/common";
 import { FilmsService } from "./films.service";
 import { CreateFilmDto } from "./dto/create-film.dto";
 import { UpdateFilmDto } from "./dto/update-film.dto";
-import { CACHE_MANAGER, CacheStore } from "@nestjs/cache-manager";
-import { NotFoundException } from "@nestjs/common";
-import {
-    REDIS_FILMS_PREFIX,
-    REDIS_KEY_DELIMITER
-} from "src/constants/constants";
-
 @Controller("films")
 export class FilmsController {
-    constructor(
-        private readonly filmsService: FilmsService,
-        @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore
-    ) {}
+    constructor(private readonly filmsService: FilmsService) {}
 
     @Post()
     create(@Body() createFilmDto: CreateFilmDto) {
@@ -39,21 +28,7 @@ export class FilmsController {
 
     @Get(":id")
     async findOne(@Param("id") id: string) {
-        const cachedData = await this.cacheManager.get(this.getCacheKey(id));
-        if (cachedData) {
-            console.log("caching");
-            return cachedData;
-        }
-
-        console.log("fetching from database"); // If not cached, fetch from database and cache it
-        const film = await this.filmsService.findOne(+id);
-        if (!film) {
-            throw new NotFoundException("Film does not exist");
-        }
-
-        await this.cacheManager.set(this.getCacheKey(id), film, 1000);
-
-        return film;
+        return this.filmsService.findOne(+id);
     }
 
     @Patch(":id")
@@ -64,9 +39,5 @@ export class FilmsController {
     @Delete(":id")
     remove(@Param("id") id: string) {
         return this.filmsService.remove(+id);
-    }
-
-    private getCacheKey(id: string | number) {
-        return `${REDIS_FILMS_PREFIX}${REDIS_KEY_DELIMITER}${id}`;
     }
 }
