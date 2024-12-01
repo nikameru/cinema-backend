@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from "@nestjs/common";
+import {
+    BadRequestException,
+    forwardRef,
+    Inject,
+    Injectable
+} from "@nestjs/common";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -21,7 +26,8 @@ export class SessionsService {
         private readonly sessionRepository: Repository<SessionEntity>,
         @Inject() private readonly filmsService: FilmsService,
         @Inject() private readonly roomsService: RoomsService,
-        @Inject() private readonly ordersService: OrdersService
+        @Inject(forwardRef(() => OrdersService))
+        private readonly ordersService: OrdersService
     ) {}
 
     async create(createSessionDto: CreateSessionDto) {

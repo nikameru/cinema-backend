@@ -17,6 +17,7 @@ export class UsersService {
         const { password, ...data } = createUserDto;
         const user = this.userRepository.create(data);
         user.password = await bcrypt.hash(password, 10);
+
         return this.userRepository.save(user);
     }
 
@@ -24,8 +25,19 @@ export class UsersService {
         return await this.userRepository.find();
     }
 
-    async findOne(where: FindOptionsWhere<UserEntity>) {
-        return await this.userRepository.findOneBy(where);
+    async findOne(
+        where: FindOptionsWhere<UserEntity>,
+        selectPassword: boolean = false
+    ) {
+        const queryBuilder = this.userRepository
+            .createQueryBuilder("user")
+            .where(where);
+
+        if (selectPassword) {
+            queryBuilder.addSelect("user.password");
+        }
+
+        return await queryBuilder.getOne();
     }
 
     async update(id: number, updateUserDto: UpdateUserDto) {

@@ -37,7 +37,10 @@ export class OrderEntity {
     @Column()
     date: Date;
 
-    @Column("int", { array: true })
+    @Column("int", {
+        nullable: true,
+        array: true
+    })
     seatIds: number[];
 
     @Column({

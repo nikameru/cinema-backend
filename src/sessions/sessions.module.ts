@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { SessionsService } from "./sessions.service";
 import { SessionsController } from "./sessions.controller";
 import { SessionEntity } from "./entities/session.entity";
@@ -12,7 +12,7 @@ import { OrdersModule } from "src/orders/orders.module";
         TypeOrmModule.forFeature([SessionEntity]),
         FilmsModule,
         RoomsModule,
-        OrdersModule
+        forwardRef(() => OrdersModule)
     ],
     controllers: [SessionsController],
     providers: [SessionsService],

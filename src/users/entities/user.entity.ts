@@ -14,9 +14,11 @@ export class UserEntity {
     @Column()
     email: string;
 
-    @Column()
+    @Column({
+        select: false
+    })
     password: string;
 
-    @OneToMany(() => OrderEntity, (order) => order.id)
+    @OneToMany(() => OrderEntity, (order) => order.user)
     orders: OrderEntity[];
 }

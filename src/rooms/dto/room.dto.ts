@@ -1,10 +1,11 @@
 import { RoomEntity } from "../entities/room.entity";
-import { IsNumber, IsString } from "class-validator";
+import { IsNumber, ValidateNested } from "class-validator";
+import { SessionDto } from "src/sessions/dto/session.dto";
 
 export class RoomDto extends RoomEntity {
     @IsNumber()
     id: number;
 
-    @IsString()
-    seats: string;
+    @ValidateNested()
+    sessions: SessionDto[];
 }

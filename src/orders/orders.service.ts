@@ -1,6 +1,7 @@
 import {
     BadRequestException,
     ConflictException,
+    forwardRef,
     Inject,
     Injectable
 } from "@nestjs/common";
@@ -28,7 +29,8 @@ export class OrdersService {
         @InjectRepository(OrderEntity)
         private readonly orderRepository: Repository<OrderEntity>,
         @Inject() private readonly usersService: UsersService,
-        @Inject() private readonly sessionsService: SessionsService,
+        @Inject(forwardRef(() => SessionsService))
+        private readonly sessionsService: SessionsService,
         @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore
     ) {}
 
