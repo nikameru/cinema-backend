@@ -13,11 +13,14 @@ import { OrdersService } from "./orders.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { UpdateOrderDto } from "./dto/update-order.dto";
 import { JwtGuard } from "src/auth/guards/jwt.guard";
+import { TicketsService } from './tickets/tickets.service';
 
 @Controller("orders")
 @UseGuards(JwtGuard)
 export class OrdersController {
-    constructor(private readonly ordersService: OrdersService) {}
+    constructor(private readonly ordersService: OrdersService,
+        private readonly ticketsService: TicketsService
+    ) {}
 
     @Post("reserve")
     createReservation(@Body() createOrderDto: CreateOrderDto) {
@@ -38,6 +41,11 @@ export class OrdersController {
     @Get(":id")
     findOne(@Param("id") id: string) {
         return this.ordersService.findOne({ id: +id });
+    }
+
+    @Get(':id/tickets')
+    async getTickets(@Param("id") orderId: number) {
+        return await this.ticketsService.getTickets(orderId);
     }
 
     @Patch(":id")

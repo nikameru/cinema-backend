@@ -15,6 +15,7 @@ import {
     Repository
 } from "typeorm";
 import { CACHE_MANAGER, CacheStore } from "@nestjs/cache-manager";
+import { TicketsService } from './tickets/tickets.service';
 import {
     REDIS_KEY_DELIMITER,
     REDIS_ORDERS_PREFIX
