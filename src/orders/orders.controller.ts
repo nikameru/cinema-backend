@@ -7,13 +7,16 @@ import {
     Param,
     Delete,
     UseGuards,
-    Req
+    Req,
+    StreamableFile,
+    InternalServerErrorException
 } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { UpdateOrderDto } from "./dto/update-order.dto";
 import { JwtGuard } from "src/auth/guards/jwt.guard";
 import { TicketsService } from "./tickets/tickets.service";
+import * as fs from "node:fs";
 
 @Controller("orders")
 @UseGuards(JwtGuard)
@@ -45,8 +48,19 @@ export class OrdersController {
     }
 
     @Get(":id/tickets")
-    getTickets(@Param("id") orderId: number) {
-        return this.ticketsService.getTickets(orderId);
+    async getTickets(@Param("id") orderId: number): Promise<StreamableFile> {
+        try {
+            const ticketFile = fs.createReadStream(
+                await this.ticketsService.getTickets(orderId)
+            );
+
+            return new StreamableFile(ticketFile, {
+                type: "image/jpeg",
+                disposition: `attachment; filename="ticket.jpeg"`
+            });
+        } catch (error) {
+            throw new InternalServerErrorException();
+        }
     }
 
     @Patch(":id")

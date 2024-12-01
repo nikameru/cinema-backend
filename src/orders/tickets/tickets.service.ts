@@ -4,27 +4,25 @@ import * as canvas from "canvas";
 import * as fs from "fs";
 import { OrdersService } from "../orders.service";
 import { OrderEntity } from "../entities/order.entity";
+import * as path from "path";
 
 @Injectable()
 export class TicketsService {
     constructor(private readonly ordersService: OrdersService) {}
 
-    async getTickets(orderId: number) {
+    async getTickets(orderId: number): Promise<string> {
         const order = await this.ordersService.findOne({ id: orderId });
         console.log(order);
-        try {
-            const ticketBuffer = fs.readFileSync(`./ticket${order.id}.jpeg`);
 
-            return ticketBuffer;
-        } catch (error) {
-            console.log(error);
+        const filepath = this.getTicketFilepath(orderId, 1);
+        if (!fs.existsSync(filepath)) {
             await this.generateTicket(order);
-
-            return this.getTickets(orderId);
         }
+
+        return filepath;
     }
 
-    async generateTicket(order: OrderEntity) {
+    private async generateTicket(order: OrderEntity) {
         const filmName = order.session.film.title;
         const roomNumber = order.session.roomId;
         const seatNumber = order.seatIds;
@@ -94,7 +92,8 @@ export class TicketsService {
         const qrImg = await canvas.loadImage(qrImage);
         ctx.drawImage(qrImg, ticketCanvas.width - 180, 100, 150, 150);
 
-        const out = fs.createWriteStream(`./ticket${order.id}.jpeg`);
+        const filename = this.getTicketFilepath(order.id, 1);
+        const out = fs.createWriteStream(filename);
         const stream = ticketCanvas.createJPEGStream({
             quality: 0.95,
             chromaSubsampling: true,
@@ -104,7 +103,7 @@ export class TicketsService {
         stream.pipe(out);
     }
 
-    drawStar(
+    private drawStar(
         ctx: any,
         cx: number,
         cy: number,
@@ -135,7 +134,7 @@ export class TicketsService {
         ctx.fill();
     }
 
-    drawProjector(ctx: any) {
+    private drawProjector(ctx: any) {
         ctx.fillStyle = "#f77f00";
 
         // Верхние катушки
@@ -180,7 +179,7 @@ export class TicketsService {
         ctx.fill();
     }
 
-    drawDecorativeLines(ctx: any, width: number, height: number) {
+    private drawDecorativeLines(ctx: any, width: number, height: number) {
         ctx.strokeStyle = "#f77f00";
         ctx.lineWidth = 2;
         ctx.setLineDash([5, 5]);
@@ -200,5 +199,9 @@ export class TicketsService {
             }
             ctx.stroke();
         }
+    }
+
+    private getTicketFilepath(orderId: number, seat: number) {
+        return path.resolve(__dirname, `ticket_${orderId}_${seat}.jpeg`);
     }
 }
