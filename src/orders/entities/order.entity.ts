@@ -5,7 +5,6 @@ import {
     Entity,
     JoinColumn,
     ManyToOne,
-    OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
 
@@ -30,7 +29,7 @@ export class OrderEntity {
     })
     sessionId: number;
 
-    @OneToOne(() => SessionEntity)
+    @ManyToOne(() => SessionEntity, (session) => session.orders)
     @JoinColumn()
     session: SessionEntity;
 

@@ -1,10 +1,12 @@
 import { FilmEntity } from "src/films/entities/film.entity";
+import { OrderEntity } from "src/orders/entities/order.entity";
 import { RoomEntity } from "src/rooms/entities/room.entity";
 import {
     Column,
     Entity,
     JoinColumn,
     ManyToOne,
+    OneToMany,
     PrimaryGeneratedColumn
 } from "typeorm";
 
@@ -35,4 +37,7 @@ export class SessionEntity {
     @ManyToOne(() => RoomEntity, (room) => room.sessions)
     @JoinColumn()
     room: RoomEntity;
+
+    @OneToMany(() => OrderEntity, (order) => order.session)
+    orders: OrderEntity[];
 }
