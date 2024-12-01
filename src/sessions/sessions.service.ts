@@ -1,33 +1,27 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { SessionEntity } from "./entities/session.entity";
 import { FindOptionsWhere, Repository } from "typeorm";
-import { FilmEntity } from "../films/entities/film.entity";
-import { RoomEntity } from "src/rooms/entities/room.entity";
+import { FilmsService } from "src/films/films.service";
+import { RoomsService } from "src/rooms/rooms.service";
 
 @Injectable()
 export class SessionsService {
     constructor(
         @InjectRepository(SessionEntity)
         private readonly sessionRepository: Repository<SessionEntity>,
-        @InjectRepository(FilmEntity)
-        private readonly filmRepository: Repository<FilmEntity>,
-        @InjectRepository(RoomEntity)
-        private readonly roomRepository: Repository<RoomEntity>
+        @Inject() private readonly filmsService: FilmsService,
+        @Inject() private readonly roomsService: RoomsService
     ) {}
 
     async create(createSessionDto: CreateSessionDto) {
-        const film = await this.filmRepository.findOneBy({
-            id: createSessionDto.filmId
-        });
+        const film = await this.filmsService.findOne(createSessionDto.filmId);
         if (!film) {
             throw new BadRequestException("Film not found");
         }
-        const room = await this.roomRepository.findOneBy({
-            id: createSessionDto.roomId
-        });
+        const room = await this.roomsService.findOne(createSessionDto.roomId);
         if (!room) {
             throw new BadRequestException("Room not found");
         }
