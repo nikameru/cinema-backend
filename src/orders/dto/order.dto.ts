@@ -12,12 +12,9 @@ export class OrderDto extends OrderEntity {
     @IsNumber()
     sessionId: number;
 
-    @IsNumber()
-    roomId: number;
-
-    @IsArray({ each: true })
-    @IsInt()
-    @Min(1)
-    @Max(SEATS_PER_ROOM)
+    @IsArray()
+    @IsInt({ each: true })
+    @Min(1, { each: true })
+    @Max(SEATS_PER_ROOM, { each: true })
     seatIds: number[];
 }

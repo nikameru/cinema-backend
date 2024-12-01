@@ -65,26 +65,33 @@ export class OrdersService {
             ...createOrderDto
         });
 
+        reservation.date = new Date();
         reservation.isPaid = false;
-        //reservation.reservationExpiresAt = new Date().setMinutes(new Date().getMinutes() + 15);
+        reservation.reservationExpiresAt = new Date(
+            new Date().setMinutes(new Date().getMinutes() + 15)
+        );
 
         await this.orderRepository.save(reservation);
     }
 
     async createOrder(userId: number) {
-        const reservation = await this.cacheManager.get<OrderEntity>(
-            this.getCacheKey(userId)
-        );
+        const reservation = await this.orderRepository.findOneBy({
+            userId,
+            isPaid: false,
+            reservationExpiresAt: MoreThanOrEqual(new Date())
+        });
         if (!reservation) {
             throw new ConflictException(
                 "Wrong order flow! No reservation has been made"
             );
         }
-        this.cacheManager.del(this.getCacheKey(userId));
 
         reservation.date = new Date();
 
-        return await this.orderRepository.save(reservation);
+        return await this.orderRepository.update(reservation.id, {
+            isPaid: true,
+            reservationExpiresAt: null
+        });
     }
 
     findAll() {
@@ -94,7 +101,12 @@ export class OrdersService {
     findOne(where: FindOptionsWhere<OrderEntity>) {
         return this.orderRepository.findOne({
             where,
-            relations: ["user", "session"]
+            relations: {
+                user: true,
+                session: {
+                    film: true
+                }
+            }
         });
     }
 
