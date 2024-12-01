@@ -1,11 +1,13 @@
-import { FilmEntity } from "src/films/entities/film.entity";
 import { SeatEntity } from "src/seats/entities/seat.entity";
+import { SessionEntity } from "src/sessions/entities/session.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import {
     Column,
     Entity,
     JoinColumn,
-    OneToMany,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
     OneToOne,
     PrimaryGeneratedColumn
 } from "typeorm";
@@ -17,17 +19,38 @@ export class OrderEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => UserEntity, (user) => user.id)
+    @Column({
+        nullable: true
+    })
+    userId: number;
+
+    @ManyToOne(() => UserEntity, (user) => user.orders)
     @JoinColumn()
     user: UserEntity;
 
-    @OneToOne(() => FilmEntity, (film) => film.id)
+    @Column({
+        nullable: true
+    })
+    sessionId: number;
+
+    @OneToOne(() => SessionEntity)
     @JoinColumn()
-    film: FilmEntity;
+    session: SessionEntity;
 
     @Column()
     date: Date;
 
-    @OneToMany(() => SeatEntity, (seat) => seat.id)
+    @ManyToMany(() => SeatEntity, { eager: true })
+    @JoinTable()
     seats: SeatEntity[];
+
+    @Column({
+        default: false
+    })
+    isPaid: boolean;
+
+    @Column({
+        nullable: true
+    })
+    reservationExpiresAt: Date;
 }
