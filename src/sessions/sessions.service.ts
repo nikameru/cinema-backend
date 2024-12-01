@@ -108,8 +108,7 @@ export class SessionsService {
             throw new BadRequestException("Session is not valid");
         }
 
-        const occupiedSeats = await this.orderRepository.find( { select: { seats: true }, where: { id } } )
-
+        const occupiedSeats = await this.orderRepository.find( { select: { seatIds: true }, where: { sessionId: id } } )
         return occupiedSeats;
     }
 
