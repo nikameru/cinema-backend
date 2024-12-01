@@ -12,10 +12,14 @@ import { SessionsService } from "./sessions.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { GetCurrentSessionsDto } from "./dto/get-current-sessions.dto";
+import { Inject } from "@nestjs/common";
+import { CACHE_MANAGER, CacheStore } from "@nestjs/cache-manager";
 
 @Controller("sessions")
 export class SessionsController {
-    constructor(private readonly sessionsService: SessionsService) {}
+    constructor(private readonly sessionsService: SessionsService,
+        @Inject(CACHE_MANAGER) private readonly cacheManager: CacheStore
+    ) {}
 
     @Post()
     create(@Body() createSessionDto: CreateSessionDto) {
