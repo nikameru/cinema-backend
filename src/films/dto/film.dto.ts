@@ -8,7 +8,7 @@ export class FilmDto extends FilmEntity {
     @IsString()
     title: string;
 
-    @IsString()
+    @IsUrl()
     coverLink: string;
 
     @IsString()
@@ -17,7 +17,7 @@ export class FilmDto extends FilmEntity {
     @IsString()
     genre: string;
 
-    @IsString()
+    @IsNumber()
     rating: number;
 
     @IsString()
