@@ -88,10 +88,12 @@ export class OrdersService {
 
         reservation.date = new Date();
 
-        return await this.orderRepository.update(reservation.id, {
+        await this.orderRepository.update(reservation.id, {
             isPaid: true,
             reservationExpiresAt: null
         });
+
+        return reservation;
     }
 
     findAll() {
@@ -101,12 +103,7 @@ export class OrdersService {
     findOne(where: FindOptionsWhere<OrderEntity>) {
         return this.orderRepository.findOne({
             where,
-            relations: {
-                user: true,
-                session: {
-                    film: true
-                }
-            }
+            relations: ["user", "session", "session.film"]
         });
     }
 

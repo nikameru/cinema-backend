@@ -45,8 +45,8 @@ export class OrdersController {
     }
 
     @Get(":id/tickets")
-    async getTickets(@Param("id") orderId: number) {
-        return await this.ticketsService.getTickets(orderId);
+    getTickets(@Param("id") orderId: number) {
+        return this.ticketsService.getTickets(orderId);
     }
 
     @Patch(":id")

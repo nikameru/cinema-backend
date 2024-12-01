@@ -9,15 +9,19 @@ import { OrderEntity } from "../entities/order.entity";
 export class TicketsService {
     constructor(private readonly ordersService: OrdersService) {}
 
-    async getTickets(id: number) {
-        const order = await this.ordersService.findOne({ id });
-        fs.readFile(`./ticket${order.id}.jpeg`, async (error, data) => {
-            if (error) {
-                await this.generateTicket(order);
-                return this.getTickets(id);
-            }
-            return data;
-        });
+    async getTickets(orderId: number) {
+        const order = await this.ordersService.findOne({ id: orderId });
+        console.log(order);
+        try {
+            const ticketBuffer = fs.readFileSync(`./ticket${order.id}.jpeg`);
+
+            return ticketBuffer;
+        } catch (error) {
+            console.log(error);
+            await this.generateTicket(order);
+
+            return this.getTickets(orderId);
+        }
     }
 
     async generateTicket(order: OrderEntity) {
