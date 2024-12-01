@@ -7,7 +7,10 @@ import { FindOptionsWhere, Repository } from "typeorm";
 import { FilmsService } from "src/films/films.service";
 import { RoomsService } from "src/rooms/rooms.service";
 import { CACHE_MANAGER, CacheStore } from "@nestjs/cache-manager";
-import { REDIS_KEY_DELIMITER, REDIS_SESSIONS_PREFIX } from "src/constants/constants";
+import {
+    REDIS_KEY_DELIMITER,
+    REDIS_SESSIONS_PREFIX
+} from "src/constants/constants";
 
 @Injectable()
 export class SessionsService {
@@ -44,7 +47,7 @@ export class SessionsService {
         );
         const dateString = new Date(targetDate).toISOString().split("T")[0];
 
-        const cachedData = await this.cacheManager.get<SessionEntity>(
+        const cachedData = await this.cacheManager.get<SessionEntity[]>(
             this.getCacheKey(dateString)
         );
         if (cachedData) {
@@ -75,20 +78,10 @@ export class SessionsService {
     }
 
     async findOne(where: FindOptionsWhere<SessionEntity>) {
-        const cachedData = await this.cacheManager.get<SessionEntity>(
-            this.getCacheKey(where)
-        );
-        if(cachedData){
-            return cachedData;
-        }
-
-        const entity = await this.sessionRepository.findOne({where, relations: ["film"] });
-        await this.cacheManager.set<SessionEntity>(
-            this.getCacheKey(where),
-            entity,
-            30000
-        )
-        return entity;
+        return await this.sessionRepository.findOne({
+            where,
+            relations: ["film"]
+        });
     }
 
     update(id: number, updateSessionDto: UpdateSessionDto) {
@@ -99,7 +92,7 @@ export class SessionsService {
         return this.sessionRepository.delete(id);
     }
 
-    private getCacheKey(id: string | FindOptionsWhere<SessionEntity>): string {
+    private getCacheKey(id: string): string {
         return `${REDIS_SESSIONS_PREFIX}${REDIS_KEY_DELIMITER}${id}`;
     }
 }
