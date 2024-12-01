@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import * as qrcode from "qrcode";
 import * as canvas from "canvas";
 import * as fs from "fs";
@@ -21,100 +21,83 @@ export class TicketsService {
     }
 
     async generateTicket(order: OrderEntity) {
-        try {
-            const filmName = order.session.film.title;
-            const roomNumber = order.session.roomId;
-            const seatNumber = order.seatIds;
-            const currentDate = order.session.date;
-            const sessionDate = `${currentDate.getFullYear() + 1}-${currentDate.getMonth()}-${currentDate.getDay()}`;
-            const sessionTime = `${currentDate.getHours()}:${currentDate.getMinutes()}`;
+        const filmName = order.session.film.title;
+        const roomNumber = order.session.roomId;
+        const seatNumber = order.seatIds;
+        const currentDate = order.session.date;
+        const sessionDate = `${currentDate.getFullYear() + 1}-${currentDate.getMonth()}-${currentDate.getDay()}`;
+        const sessionTime = `${currentDate.getHours()}:${currentDate.getMinutes()}`;
 
-            const ticketData = {
-                film: filmName,
-                room: roomNumber,
-                seat: seatNumber,
-                date: sessionDate,
-                time: sessionTime
-            };
+        const ticketData = {
+            film: filmName,
+            room: roomNumber,
+            seat: seatNumber,
+            date: sessionDate,
+            time: sessionTime
+        };
 
-            const ticketCanvas = canvas.createCanvas(800, 300);
-            const ctx = ticketCanvas.getContext("2d");
+        const ticketCanvas = canvas.createCanvas(800, 300);
+        const ctx = ticketCanvas.getContext("2d");
 
-            ctx.fillStyle = "#000000";
-            ctx.fillRect(0, 0, ticketCanvas.width, ticketCanvas.height);
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(0, 0, ticketCanvas.width, ticketCanvas.height);
 
-            ctx.fillStyle = "rgba(247, 127, 0, 0.3)";
-            for (let i = 0; i < 20; i++) {
-                const x = Math.random() * ticketCanvas.width;
-                const y = Math.random() * ticketCanvas.height;
-                this.drawStar(ctx, x, y, 5, 10, 5);
-            }
-
-            ctx.fillStyle = "#f77f00";
-            ctx.fillRect(0, 0, ticketCanvas.width, 70);
-
-            this.drawDecorativeLines(
-                ctx,
-                ticketCanvas.width,
-                ticketCanvas.height
-            );
-
-            ctx.save();
-            ctx.translate(ticketCanvas.width - 320, 150);
-            ctx.scale(1.5, 1.5);
-            this.drawProjector(ctx);
-            ctx.restore();
-
-            ctx.fillStyle = "#FFFFFF";
-            ctx.font = '34px "Segoe UI"';
-            ctx.fillText("CINEMA TICKET X4LBA", 120, 45);
-
-            ctx.fillStyle = "#FFFFFF";
-            for (let i = 0; i < 5; i++) {
-                this.drawStar(
-                    ctx,
-                    ticketCanvas.width - 150 + i * 25,
-                    35,
-                    5,
-                    10,
-                    5
-                );
-            }
-
-            ctx.fillStyle = "#FFFFFF";
-            ctx.font = 'bold 24px "Segoe UI"';
-            ctx.fillText(`Фильм: ${ticketData.film}`, 30, 100);
-
-            ctx.font = '22px "Segoe UI"';
-            const date = new Date(ticketData.date);
-            const options: Intl.DateTimeFormatOptions = {
-                year: "numeric",
-                month: "long",
-                day: "numeric"
-            };
-            const formattedDate = date.toLocaleDateString("ru-RU", options);
-            ctx.fillText(`Дата: ${formattedDate}`, 30, 140);
-            ctx.fillText(`Время: ${ticketData.time}`, 30, 180);
-            ctx.fillText(`Зал: ${ticketData.room}`, 30, 220);
-            ctx.fillText(`Место: ${ticketData.seat}`, 30, 260);
-
-            const qrImage = await qrcode.toDataURL(JSON.stringify(ticketData));
-            const qrImg = await canvas.loadImage(qrImage);
-            ctx.drawImage(qrImg, ticketCanvas.width - 180, 100, 150, 150);
-
-            const out = fs.createWriteStream(`./ticket${order.id}.jpeg`);
-            const stream = ticketCanvas.createJPEGStream({
-                quality: 0.95,
-                chromaSubsampling: true,
-                progressive: true
-            });
-
-            stream.pipe(out);
-        } catch (err) {
-            throw new InternalServerErrorException(
-                "Ошибка при генерации билета"
-            );
+        ctx.fillStyle = "rgba(247, 127, 0, 0.3)";
+        for (let i = 0; i < 20; i++) {
+            const x = Math.random() * ticketCanvas.width;
+            const y = Math.random() * ticketCanvas.height;
+            this.drawStar(ctx, x, y, 5, 10, 5);
         }
+
+        ctx.fillStyle = "#f77f00";
+        ctx.fillRect(0, 0, ticketCanvas.width, 70);
+
+        this.drawDecorativeLines(ctx, ticketCanvas.width, ticketCanvas.height);
+
+        ctx.save();
+        ctx.translate(ticketCanvas.width - 320, 150);
+        ctx.scale(1.5, 1.5);
+        this.drawProjector(ctx);
+        ctx.restore();
+
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = '34px "Segoe UI"';
+        ctx.fillText("CINEMA TICKET X4LBA", 120, 45);
+
+        ctx.fillStyle = "#FFFFFF";
+        for (let i = 0; i < 5; i++) {
+            this.drawStar(ctx, ticketCanvas.width - 150 + i * 25, 35, 5, 10, 5);
+        }
+
+        ctx.fillStyle = "#FFFFFF";
+        ctx.font = 'bold 24px "Segoe UI"';
+        ctx.fillText(`Фильм: ${ticketData.film}`, 30, 100);
+
+        ctx.font = '22px "Segoe UI"';
+        const date = new Date(ticketData.date);
+        const options: Intl.DateTimeFormatOptions = {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        };
+        const formattedDate = date.toLocaleDateString("ru-RU", options);
+        ctx.fillText(`Дата: ${formattedDate}`, 30, 140);
+        ctx.fillText(`Время: ${ticketData.time}`, 30, 180);
+        ctx.fillText(`Зал: ${ticketData.room}`, 30, 220);
+        ctx.fillText(`Место: ${ticketData.seat}`, 30, 260);
+
+        const qrImage = await qrcode.toDataURL(JSON.stringify(ticketData));
+        const qrImg = await canvas.loadImage(qrImage);
+        ctx.drawImage(qrImg, ticketCanvas.width - 180, 100, 150, 150);
+
+        const out = fs.createWriteStream(`./ticket${order.id}.jpeg`);
+        const stream = ticketCanvas.createJPEGStream({
+            quality: 0.95,
+            chromaSubsampling: true,
+            progressive: true
+        });
+
+        stream.pipe(out);
     }
 
     drawStar(

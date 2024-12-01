@@ -1,6 +1,4 @@
 import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
 import { UsersModule } from "./users/users.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserEntity } from "./users/entities/user.entity";
@@ -27,7 +25,9 @@ import { SessionEntity } from "./sessions/entities/session.entity";
                 POSTGRES_PORT: Joi.number().port().default(5432),
                 POSTGRES_PASSWORD: Joi.string(),
                 POSTGRES_USER: Joi.string(),
-                POSTGRES_DB: Joi.string()
+                POSTGRES_DB: Joi.string(),
+                REDIS_HOST: Joi.string().hostname(),
+                REDIS_PORT: Joi.number().port().default(6379)
             }),
             validationOptions: {
                 allowUnknown: true,
@@ -73,7 +73,7 @@ import { SessionEntity } from "./sessions/entities/session.entity";
         RoomsModule,
         SessionsModule
     ],
-    controllers: [AppController],
-    providers: [AppService]
+    controllers: [],
+    providers: []
 })
 export class AppModule {}
