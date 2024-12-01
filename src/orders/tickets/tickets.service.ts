@@ -26,9 +26,11 @@ export class TicketsService {
         const filmName = order.session.film.title;
         const roomNumber = order.session.roomId;
         const seatNumber = order.seatIds;
-        const currentDate = order.session.date;
-        const sessionDate = `${currentDate.getFullYear() + 1}-${currentDate.getMonth()}-${currentDate.getDay()}`;
-        const sessionTime = `${currentDate.getHours()}:${currentDate.getMinutes()}`;
+        const sessionDate = order.session.date;
+        const sessionTime =
+            sessionDate.getHours().toString().padStart(2, "0") +
+            ":" +
+            sessionDate.getMinutes().toString().padStart(2, "0");
 
         const ticketData = {
             film: filmName,
