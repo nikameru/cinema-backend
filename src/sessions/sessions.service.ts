@@ -110,7 +110,10 @@ export class SessionsService {
             select: { seatIds: true },
             where: { sessionId: id }
         });
-        return occupiedSeats;
+        return occupiedSeats.reduce<number[]>((occupiedArray, entity) => {
+            occupiedArray.push(...entity.seatIds);
+            return occupiedArray;
+        }, []);
     }
 
     private getCacheKey(id: string): string {

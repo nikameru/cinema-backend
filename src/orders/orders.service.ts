@@ -16,10 +16,6 @@ import {
     Repository
 } from "typeorm";
 import { CACHE_MANAGER, CacheStore } from "@nestjs/cache-manager";
-import {
-    REDIS_KEY_DELIMITER,
-    REDIS_ORDERS_PREFIX
-} from "src/constants/constants";
 import { UsersService } from "src/users/users.service";
 import { SessionsService } from "src/sessions/sessions.service";
 
@@ -114,9 +110,5 @@ export class OrdersService {
 
     remove(id: number) {
         return this.orderRepository.delete(id);
-    }
-
-    private getCacheKey(id: string | number) {
-        return `${REDIS_ORDERS_PREFIX}${REDIS_KEY_DELIMITER}${id}`;
     }
 }
