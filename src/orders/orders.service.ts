@@ -55,6 +55,19 @@ export class OrdersService {
             throw new BadRequestException("Session not found");
         }
 
+        const occupiedSeats = await this.sessionsService.getOccupiedSeats(
+            session.id
+        );
+        if (
+            createOrderDto.seatIds.some((seatId) =>
+                occupiedSeats.includes(seatId)
+            )
+        ) {
+            throw new ConflictException(
+                "Reservation contains seats that are already occupied"
+            );
+        }
+
         const reservation = this.orderRepository.create({
             user,
             session,
