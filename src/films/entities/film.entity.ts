@@ -1,8 +1,14 @@
 import { SessionEntity } from "src/sessions/entities/session.entity";
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    OneToMany,
+    BaseEntity
+} from "typeorm";
 
 @Entity({ name: "films" })
-export class FilmEntity {
+export class FilmEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 

@@ -2,6 +2,7 @@ import { FilmEntity } from "src/films/entities/film.entity";
 import { OrderEntity } from "src/orders/entities/order.entity";
 import { RoomEntity } from "src/rooms/entities/room.entity";
 import {
+    BaseEntity,
     Column,
     Entity,
     JoinColumn,
@@ -13,7 +14,7 @@ import {
 @Entity({
     name: "sessions"
 })
-export class SessionEntity {
+export class SessionEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "Node16",
+    "module": "nodenext",
     "moduleResolution": "nodenext",
     "declaration": true,
     "removeComments": true,

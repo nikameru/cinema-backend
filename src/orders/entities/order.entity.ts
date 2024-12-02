@@ -1,6 +1,7 @@
 import { SessionEntity } from "src/sessions/entities/session.entity";
 import { UserEntity } from "src/users/entities/user.entity";
 import {
+    BaseEntity,
     Column,
     Entity,
     JoinColumn,
@@ -11,7 +12,7 @@ import {
 @Entity({
     name: "orders"
 })
-export class OrderEntity {
+export class OrderEntity extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 

@@ -80,7 +80,13 @@ import("adminjs").then((adminjs) => {
                 useFactory: () => ({
                     adminJsOptions: {
                         rootPath: "/admin",
-                        resources: []
+                        resources: [
+                            RoomEntity,
+                            FilmEntity,
+                            SessionEntity,
+                            OrderEntity,
+                            UserEntity
+                        ]
                     },
                     auth: {
                         authenticate: async (
