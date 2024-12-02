@@ -16,6 +16,15 @@ import { OrderEntity } from "./orders/entities/order.entity";
 import { SessionsModule } from "./sessions/sessions.module";
 import { SessionEntity } from "./sessions/entities/session.entity";
 
+import("adminjs").then((adminjs) => {
+    import("@adminjs/typeorm").then((AdminJSTypeorm) => {
+        adminjs.default.registerAdapter({
+            Resource: AdminJSTypeorm.Resource,
+            Database: AdminJSTypeorm.Database
+        });
+    });
+});
+
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -66,6 +75,41 @@ import { SessionEntity } from "./sessions/entities/session.entity";
             }),
             inject: [ConfigService]
         }),
+        import("@adminjs/nestjs").then(({ AdminModule }) =>
+            AdminModule.createAdminAsync({
+                useFactory: () => ({
+                    adminJsOptions: {
+                        rootPath: "/admin",
+                        resources: []
+                    },
+                    auth: {
+                        authenticate: async (
+                            email: string,
+                            password: string
+                        ) => {
+                            if (
+                                email === "admin@admin.com" &&
+                                password === "admin"
+                            ) {
+                                return Promise.resolve({
+                                    email: "admin@admin.com",
+                                    password: "admin"
+                                });
+                            }
+
+                            return null;
+                        },
+                        cookieName: "adminjs",
+                        cookiePassword: "secret"
+                    },
+                    sessionOptions: {
+                        resave: true,
+                        saveUninitialized: true,
+                        secret: "secret"
+                    }
+                })
+            })
+        ),
         UsersModule,
         OrdersModule,
         FilmsModule,
