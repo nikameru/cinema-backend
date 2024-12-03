@@ -31,17 +31,6 @@ export class OrdersService {
     ) {}
 
     async createReservation(createOrderDto: CreateOrderDto) {
-        const existingReservation = await this.orderRepository.existsBy({
-            userId: createOrderDto.userId,
-            isPaid: false,
-            reservationExpiresAt: MoreThanOrEqual(new Date())
-        });
-        if (existingReservation) {
-            throw new ConflictException(
-                "You can't make multiple reservations at once"
-            );
-        }
-
         const user = await this.usersService.findOne({
             id: createOrderDto.userId
         });
@@ -54,6 +43,13 @@ export class OrdersService {
         if (!session) {
             throw new BadRequestException("Session not found");
         }
+
+        // Remove previous reservation, if present
+        await this.orderRepository.delete({
+            userId: createOrderDto.userId,
+            isPaid: false,
+            reservationExpiresAt: MoreThanOrEqual(new Date())
+        });
 
         const occupiedSeats = await this.sessionsService.getOccupiedSeats(
             session.id
