@@ -110,6 +110,7 @@ export class SessionsService {
             select: { seatIds: true },
             where: { sessionId: id }
         });
+
         return occupiedSeats.reduce<number[]>((occupiedArray, entity) => {
             occupiedArray.push(...entity.seatIds);
             return occupiedArray;
