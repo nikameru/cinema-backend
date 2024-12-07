@@ -5,13 +5,16 @@ import {
     Body,
     Patch,
     Param,
-    Delete
+    Delete,
+    UseGuards
 } from "@nestjs/common";
 import { RoomsService } from "./rooms.service";
 import { CreateRoomDto } from "./dto/create-room.dto";
 import { UpdateRoomDto } from "./dto/update-room.dto";
+import { JwtGuard } from "src/auth/guards/jwt.guard";
 
 @Controller("rooms")
+@UseGuards(JwtGuard)
 export class RoomsController {
     constructor(private readonly roomsService: RoomsService) {}
 

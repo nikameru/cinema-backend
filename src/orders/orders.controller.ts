@@ -8,8 +8,7 @@ import {
     Delete,
     UseGuards,
     Req,
-    StreamableFile,
-    InternalServerErrorException
+    StreamableFile
 } from "@nestjs/common";
 import { OrdersService } from "./orders.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
@@ -49,18 +48,14 @@ export class OrdersController {
 
     @Get(":id/tickets")
     async getTickets(@Param("id") orderId: number): Promise<StreamableFile> {
-        try {
-            const ticketFile = fs.createReadStream(
-                await this.ticketsService.getTickets(orderId)
-            );
+        const ticketFile = fs.createReadStream(
+            await this.ticketsService.getGeneratedPdfFilepath(orderId)
+        );
 
-            return new StreamableFile(ticketFile, {
-                type: "image/jpeg",
-                disposition: `attachment; filename="ticket.jpeg"`
-            });
-        } catch (error) {
-            throw new InternalServerErrorException();
-        }
+        return new StreamableFile(ticketFile, {
+            type: "application/pdf",
+            disposition: `attachment; filename="tickets.pdf"`
+        });
     }
 
     @Patch(":id")

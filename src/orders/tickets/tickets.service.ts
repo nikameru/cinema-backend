@@ -4,25 +4,24 @@ import * as canvas from "canvas";
 import * as fs from "fs";
 import { OrdersService } from "../orders.service";
 import { OrderEntity } from "../entities/order.entity";
-import * as path from "path";
+import * as PDFDocument from "pdfkit";
 
 @Injectable()
 export class TicketsService {
     constructor(private readonly ordersService: OrdersService) {}
 
-    async getTickets(orderId: number): Promise<string> {
+    async getGeneratedPdfFilepath(orderId: number): Promise<string> {
         const order = await this.ordersService.findOne({ id: orderId });
-        console.log(order);
 
-        const filepath = this.getTicketFilepath(orderId, 1);
+        const filepath = this.getTicketsFilepathFor(orderId);
         if (!fs.existsSync(filepath)) {
-            await this.generateTicket(order);
+            await this.generateTicketsPdf(order);
         }
 
         return filepath;
     }
 
-    private async generateTicket(order: OrderEntity) {
+    private async generateTicketsPdf(order: OrderEntity) {
         const filmName = order.session.film.title;
         const roomNumber = order.session.roomId;
         const seatNumber = order.seatIds;
@@ -40,26 +39,38 @@ export class TicketsService {
             time: sessionTime
         };
 
-        const ticketCanvas = canvas.createCanvas(800, 300);
-        const ctx = ticketCanvas.getContext("2d");
+        const baseTicketCanvas = canvas.createCanvas(800, 300);
+
+        const pdf = new PDFDocument({
+            size: [baseTicketCanvas.width, baseTicketCanvas.height]
+        });
+        const pdfFilename = this.getTicketsFilepathFor(order.id);
+        const writeStream = fs.createWriteStream(pdfFilename);
+        pdf.pipe(writeStream);
+
+        const ctx = baseTicketCanvas.getContext("2d");
 
         ctx.fillStyle = "#000000";
-        ctx.fillRect(0, 0, ticketCanvas.width, ticketCanvas.height);
+        ctx.fillRect(0, 0, baseTicketCanvas.width, baseTicketCanvas.height);
 
         ctx.fillStyle = "rgba(247, 127, 0, 0.3)";
         for (let i = 0; i < 20; i++) {
-            const x = Math.random() * ticketCanvas.width;
-            const y = Math.random() * ticketCanvas.height;
+            const x = Math.random() * baseTicketCanvas.width;
+            const y = Math.random() * baseTicketCanvas.height;
             this.drawStar(ctx, x, y, 5, 10, 5);
         }
 
         ctx.fillStyle = "#f77f00";
-        ctx.fillRect(0, 0, ticketCanvas.width, 70);
+        ctx.fillRect(0, 0, baseTicketCanvas.width, 70);
 
-        this.drawDecorativeLines(ctx, ticketCanvas.width, ticketCanvas.height);
+        this.drawDecorativeLines(
+            ctx,
+            baseTicketCanvas.width,
+            baseTicketCanvas.height
+        );
 
         ctx.save();
-        ctx.translate(ticketCanvas.width - 320, 150);
+        ctx.translate(baseTicketCanvas.width - 320, 150);
         ctx.scale(1.5, 1.5);
         this.drawProjector(ctx);
         ctx.restore();
@@ -70,12 +81,19 @@ export class TicketsService {
 
         ctx.fillStyle = "#FFFFFF";
         for (let i = 0; i < 5; i++) {
-            this.drawStar(ctx, ticketCanvas.width - 150 + i * 25, 35, 5, 10, 5);
+            this.drawStar(
+                ctx,
+                baseTicketCanvas.width - 150 + i * 25,
+                35,
+                5,
+                10,
+                5
+            );
         }
 
         ctx.fillStyle = "#FFFFFF";
         ctx.font = 'bold 24px "Segoe UI"';
-        ctx.fillText(`Фильм: ${ticketData.film}`, 30, 100);
+        ctx.fillText(`Film: ${ticketData.film}`, 30, 100);
 
         ctx.font = '22px "Segoe UI"';
         const date = new Date(ticketData.date);
@@ -84,25 +102,38 @@ export class TicketsService {
             month: "long",
             day: "numeric"
         };
-        const formattedDate = date.toLocaleDateString("ru-RU", options);
-        ctx.fillText(`Дата: ${formattedDate}`, 30, 140);
-        ctx.fillText(`Время: ${ticketData.time}`, 30, 180);
-        ctx.fillText(`Зал: ${ticketData.room}`, 30, 220);
-        ctx.fillText(`Место: ${ticketData.seat}`, 30, 260);
+        const formattedDate = date.toLocaleDateString("en-EN", options);
+        ctx.fillText(`Date: ${formattedDate}`, 30, 140);
+        ctx.fillText(`Time: ${ticketData.time}`, 30, 180);
+        ctx.fillText(`Cinema hall: ${ticketData.room}`, 30, 220);
 
-        const qrImage = await qrcode.toDataURL(JSON.stringify(ticketData));
-        const qrImg = await canvas.loadImage(qrImage);
-        ctx.drawImage(qrImg, ticketCanvas.width - 180, 100, 150, 150);
+        const qrImageUrl = await qrcode.toDataURL(JSON.stringify(ticketData));
+        const qrImage = await canvas.loadImage(qrImageUrl);
+        ctx.drawImage(qrImage, baseTicketCanvas.width - 180, 100, 150, 150);
 
-        const filename = this.getTicketFilepath(order.id, 1);
-        const out = fs.createWriteStream(filename);
-        const stream = ticketCanvas.createJPEGStream({
-            quality: 0.95,
-            chromaSubsampling: true,
-            progressive: true
-        });
+        let i = 0;
+        for (const seatId of ticketData.seat) {
+            const ticketCanvas = canvas.createCanvas(800, 300);
+            const ticketCtx = ticketCanvas.getContext("2d");
+            ticketCtx.drawImage(baseTicketCanvas, 0, 0);
 
-        stream.pipe(out);
+            ticketCtx.fillStyle = "#FFFFFF";
+            ticketCtx.font = '22px "Segoe UI"';
+            ticketCtx.fillText(`Seat: ${seatId}`, 30, 260);
+
+            const imgBuffer = ticketCanvas.toBuffer("image/jpeg");
+            if (i !== 0) {
+                pdf.addPage();
+            }
+            pdf.image(imgBuffer, 0, 0, {
+                width: ticketCanvas.width,
+                height: ticketCanvas.height
+            });
+
+            console.log(`Finishing ticket ${++i}/${ticketData.seat.length}`);
+        }
+
+        pdf.end();
     }
 
     private drawStar(
@@ -139,7 +170,6 @@ export class TicketsService {
     private drawProjector(ctx: any) {
         ctx.fillStyle = "#f77f00";
 
-        // Верхние катушки
         ctx.beginPath();
         ctx.arc(-15, -20, 10, 0, Math.PI * 2);
         ctx.fill();
@@ -203,7 +233,7 @@ export class TicketsService {
         }
     }
 
-    private getTicketFilepath(orderId: number, seat: number) {
-        return path.resolve(__dirname, `ticket_${orderId}_${seat}.jpeg`);
+    private getTicketsFilepathFor(orderId: number) {
+        return `tickets_${orderId}.pdf`;
     }
 }
