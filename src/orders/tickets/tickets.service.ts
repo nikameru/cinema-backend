@@ -4,7 +4,7 @@ import * as canvas from "canvas";
 import * as fs from "fs";
 import { OrdersService } from "../orders.service";
 import { OrderEntity } from "../entities/order.entity";
-import * as PDFDocument from "pdfkit";
+import PDFDocument from "pdfkit";
 
 @Injectable()
 export class TicketsService {

@@ -89,6 +89,7 @@ import("adminjs").then((adminjs) => {
                         ]
                     },
                     auth: {
+                        // Test implementation
                         authenticate: async (
                             email: string,
                             password: string
