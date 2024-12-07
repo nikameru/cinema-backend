@@ -6,13 +6,15 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { FilmsModule } from "src/films/films.module";
 import { RoomsModule } from "src/rooms/rooms.module";
 import { OrdersModule } from "src/orders/orders.module";
+import { JwtModule } from "@nestjs/jwt";
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([SessionEntity]),
         FilmsModule,
         RoomsModule,
-        forwardRef(() => OrdersModule)
+        forwardRef(() => OrdersModule),
+        JwtModule
     ],
     controllers: [SessionsController],
     providers: [SessionsService],

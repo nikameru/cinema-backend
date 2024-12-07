@@ -6,18 +6,21 @@ import {
     Patch,
     Param,
     Delete,
-    Query
+    Query,
+    UseGuards
 } from "@nestjs/common";
 import { SessionsService } from "./sessions.service";
 import { CreateSessionDto } from "./dto/create-session.dto";
 import { UpdateSessionDto } from "./dto/update-session.dto";
 import { GetCurrentSessionsDto } from "./dto/get-current-sessions.dto";
+import { JwtGuard } from "src/auth/guards/jwt.guard";
 
 @Controller("sessions")
 export class SessionsController {
     constructor(private readonly sessionsService: SessionsService) {}
 
     @Post()
+    @UseGuards(JwtGuard)
     create(@Body() createSessionDto: CreateSessionDto) {
         return this.sessionsService.create(createSessionDto);
     }
@@ -29,8 +32,8 @@ export class SessionsController {
         );
     }
 
-    // For debug
     @Get("all")
+    @UseGuards(JwtGuard)
     findAll() {
         return this.sessionsService.findAll();
     }
@@ -41,6 +44,7 @@ export class SessionsController {
     }
 
     @Patch(":id")
+    @UseGuards(JwtGuard)
     update(
         @Param("id") id: string,
         @Body() updateSessionDto: UpdateSessionDto
@@ -49,6 +53,7 @@ export class SessionsController {
     }
 
     @Delete(":id")
+    @UseGuards(JwtGuard)
     remove(@Param("id") id: string) {
         return this.sessionsService.remove(+id);
     }
