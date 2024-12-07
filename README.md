@@ -12,6 +12,7 @@ This is a preparation project for a contest written in a couple of days to meet 
 - **Seat Booking System 📖**: Track and manage occupied seats for each session
 - **Caching Implementation ⏲**: Redis-based caching for improved performance
 - **RESTful API ✨**: Full CRUD operations for cinema resources
+- **Admin panel 🎩**: Create and view existing films with ease
 
 ## Tech Stack
 
